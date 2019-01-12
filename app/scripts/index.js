@@ -14,8 +14,9 @@ const StarNotary = contract(StarNotaryArtifact)
 // The following code is simple to show off interacting with your contracts.
 // As your needs grow you will likely need to change its form and structure.
 // For application bootstrapping, check out window.addEventListener below.
-let accounts
-let account
+let accounts;
+let account;
+let star;
 
 const createStar = async () => {
   const instance = await StarNotary.deployed();
@@ -26,8 +27,13 @@ const createStar = async () => {
 }
 
 // Add a function lookUp to Lookup a star by ID using tokenIdToStarInfo()
-
-//
+const lookUpStar = async () => {
+  const instance = await StarNotary.deployed();
+  const starId = document.getElementById("starIdToLookUp").value;
+  star = await instance.tokenIdToStarInfo.call(starId);
+  console.log(star); // not sure why the variable star is a string of the star.name of the Struct, was expecting an object, but oh well!
+  App.setStatus("Star Name is: " + star);
+}
 
 const App = {
   start: function () {
@@ -63,6 +69,10 @@ const App = {
     createStar();
   },
 
+  lookUpStar: function () {
+    lookUpStar();
+  },
+  
 }
 
 window.App = App

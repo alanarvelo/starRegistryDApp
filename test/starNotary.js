@@ -1,5 +1,5 @@
 //import 'babel-polyfill';
-const StarNotary = artifacts.require('./starNotary.sol')
+const StarNotary = artifacts.require('./StarNotary.sol')
 
 let instance;
 let accounts;
@@ -66,5 +66,35 @@ contract('StarNotary', async (accs) => {
   // Write Tests for:
 
 // 1) The token name and token symbol are added properly.
-// 2) 2 users can exchange their stars.
+  it('Token Name and Symbol are correctly set', async() => {
+    assert.equal(await instance.name.call(), "Star Notary Project Token")
+    assert.equal(await instance.symbol.call(), "SNT")
+  });
+
+// 2) 2 users can exchange their stars, with mutual consent.
+  it('user1 and user2 can exchange their stars', async() => {
+    let user1 = accounts[1]
+    let user2 = accounts[2]
+    let starId1 = 11
+    let starId2 = 22
+    await instance.createStar('awesome star 1', starId1, {from: user1})
+    await instance.createStar('awesome star 2', starId2, {from: user2})
+
+    await instance.approve(user1, starId2, {from: user2})
+
+    await instance.exchangeStars(starId1, user2, starId2, {from: user1});
+    assert.equal(await instance.ownerOf.call(starId1), user2);
+    assert.equal(await instance.ownerOf.call(starId2), user1);
+  });
+
 // 3) Stars Tokens can be transferred from one address to another.
+
+  it('user1 can transfer tokens to another user', async() => {
+    let user1 = accounts[1]
+    let user2 = accounts[2]
+    let starId = 6
+    await instance.createStar('awesome star 6', starId, {from: user1})
+    
+    await instance.transferMyStar(user2, starId, {from: user1});
+    assert.equal(await instance.ownerOf.call(starId), user2);
+  });

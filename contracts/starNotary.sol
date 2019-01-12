@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
 
 contract StarNotary is ERC721 {
 
@@ -9,8 +9,8 @@ contract StarNotary is ERC721 {
     }
 
 //  Add a name and a symbol for your starNotary tokens
-
-//
+    string public constant name = "Star Notary Project Token";
+    string public constant symbol = "SNT";
 
     mapping(uint256 => Star) public tokenIdToStarInfo;
     mapping(uint256 => uint256) public starsForSale;
@@ -24,8 +24,9 @@ contract StarNotary is ERC721 {
     }
 
 // Add a function lookUptokenIdToStarInfo, that looks up the stars using the Token ID, and then returns the name of the star.
-
-//
+    function lookUptokenIdToStarInfo(uint256 _tokenId) public view returns (string _starName) {
+        _starName = tokenIdToStarInfo[_tokenId].name;
+    }
 
     function putStarUpForSale(uint256 _tokenId, uint256 _price) public {
         require(ownerOf(_tokenId) == msg.sender);
@@ -49,15 +50,23 @@ contract StarNotary is ERC721 {
             msg.sender.transfer(msg.value - starCost);
         }
         starsForSale[_tokenId] = 0;
-      }
+    }
 
 // Add a function called exchangeStars, so 2 users can exchange their star tokens...
 //Do not worry about the price, just write code to exchange stars between users.
+    function exchangeStars(uint256 _tokenId1, address _owner2, uint256 _tokenId2) public {
+        require(ownerOf(_tokenId1) == msg.sender);
+        require(ownerOf(_tokenId2) == _owner2);
 
-//
+        transferFrom(msg.sender, _owner2, _tokenId1);
+        transferFrom(_owner2, msg.sender, _tokenId2);
+    }
 
 // Write a function to Transfer a Star. The function should transfer a star from the address of the caller.
 // The function should accept 2 arguments, the address to transfer the star to, and the token ID of the star.
 //
+    function transferMyStar(address to, uint256 _tokenId) public {
+        transferFrom(msg.sender, to, _tokenId);
+    }
 
 }
